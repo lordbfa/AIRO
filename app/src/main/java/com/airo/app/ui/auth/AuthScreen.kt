@@ -121,22 +121,24 @@ fun AuthScreen(viewModel: AuthViewModel) {
             Text(if (isSignUp) "Already have an account? Sign in" else "New here? Create an account")
         }
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+        if (BuildConfig.GOOGLE_WEB_CLIENT_ID.isNotBlank()) {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
-        OutlinedButton(
-            onClick = {
-                scope.launch {
-                    signInWithGoogle(
-                        context = context,
-                        onIdToken = viewModel::signInWithGoogleIdToken,
-                        onError = viewModel::onGoogleSignInFailed,
-                    )
-                }
-            },
-            enabled = !isLoading,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text("Continue with Google")
+            OutlinedButton(
+                onClick = {
+                    scope.launch {
+                        signInWithGoogle(
+                            context = context,
+                            onIdToken = viewModel::signInWithGoogleIdToken,
+                            onError = viewModel::onGoogleSignInFailed,
+                        )
+                    }
+                },
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Continue with Google")
+            }
         }
 
         if (isLoading) {
