@@ -14,12 +14,15 @@ import androidx.compose.runtime.setValue
 fun AddSpaceDialog(
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
+    title: String = "New space",
+    initialName: String = "",
+    confirmLabel: String = "Add",
 ) {
-    var name by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf(initialName) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New space") },
+        title = { Text(title) },
         text = {
             OutlinedTextField(
                 value = name,
@@ -30,7 +33,7 @@ fun AddSpaceDialog(
         },
         confirmButton = {
             TextButton(onClick = { onConfirm(name) }, enabled = name.isNotBlank()) {
-                Text("Add")
+                Text(confirmLabel)
             }
         },
         dismissButton = {

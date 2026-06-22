@@ -2,6 +2,8 @@ package com.airo.app.ui.nav
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -12,14 +14,21 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.airo.app.AiroApplication
+import com.airo.app.data.auth.AuthRepository
+import com.airo.app.data.repository.WardrobeRepository
+import com.airo.app.ui.auth.AuthScreen
+import com.airo.app.ui.auth.AuthViewModel
 import com.airo.app.ui.home.HomeScreen
 import com.airo.app.ui.home.HomeViewModel
+import com.airo.app.ui.profile.ProfileScreen
+import com.airo.app.ui.profile.ProfileViewModel
 import com.airo.app.ui.scan.ScanScreen
 import com.airo.app.ui.scan.ScanViewModel
 import com.airo.app.ui.space.SpaceDetailScreen
 import com.airo.app.ui.space.SpaceDetailViewModel
 
 private const val ROUTE_HOME = "home"
+private const val ROUTE_PROFILE = "profile"
 private const val ROUTE_SPACE = "space/{spaceId}/{spaceName}"
 private const val ROUTE_SCAN = "scan/{spaceId}/{spaceName}"
 
@@ -28,18 +37,53 @@ private fun scanRoute(spaceId: String, spaceName: String) = "scan/$spaceId/${Uri
 
 @Composable
 fun AiroNavHost() {
-    val navController = rememberNavController()
     val container = (LocalContext.current.applicationContext as AiroApplication).container
-    val repository = container.repository
+    val authRepository = container.authRepository
+    val user by authRepository.currentUserFlow.collectAsState(initial = authRepository.currentUserSnapshot())
+
+    val signedInUser = user
+    if (signedInUser == null) {
+        val authViewModel: AuthViewModel = viewModel(
+            factory = viewModelFactory { initializer { AuthViewModel(authRepository) } },
+        )
+        AuthScreen(viewModel = authViewModel)
+    } else {
+        MainNavHost(
+            repository = container.repository,
+            authRepository = authRepository,
+            userId = signedInUser.uid,
+        )
+    }
+}
+
+@Composable
+private fun MainNavHost(
+    repository: WardrobeRepository,
+    authRepository: AuthRepository,
+    userId: String,
+) {
+    val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = ROUTE_HOME) {
         composable(ROUTE_HOME) {
             val viewModel: HomeViewModel = viewModel(
-                factory = viewModelFactory { initializer { HomeViewModel(repository) } },
+                key = userId,
+                factory = viewModelFactory { initializer { HomeViewModel(repository, userId) } },
             )
             HomeScreen(
                 viewModel = viewModel,
                 onSpaceClick = { space -> navController.navigate(spaceRoute(space.id, space.name)) },
+                onProfileClick = { navController.navigate(ROUTE_PROFILE) },
+            )
+        }
+
+        composable(ROUTE_PROFILE) {
+            val viewModel: ProfileViewModel = viewModel(
+                factory = viewModelFactory { initializer { ProfileViewModel(authRepository) } },
+            )
+            ProfileScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
             )
         }
 

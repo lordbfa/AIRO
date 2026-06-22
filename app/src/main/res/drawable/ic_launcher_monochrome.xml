@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Same geometry as ic_launcher_foreground; the system tints this layer for themed icons (Android 13+). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="
+            M24,24 L40,24 L40,30 L24,30 Z
+            M24,24 L30,24 L30,40 L24,40 Z
+            M68,24 L84,24 L84,30 L68,30 Z
+            M78,24 L84,24 L84,40 L78,40 Z
+            M24,78 L40,78 L40,84 L24,84 Z
+            M24,68 L30,68 L30,84 L24,84 Z
+            M68,78 L84,78 L84,84 L68,84 Z
+            M78,68 L84,68 L84,84 L78,84 Z
+            M54,41 A13,13 0 1,1 54,67 A13,13 0 1,1 54,41 Z" />
+</vector>

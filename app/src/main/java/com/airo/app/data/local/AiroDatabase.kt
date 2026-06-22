@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [SpaceEntity::class, InventoryItemEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class AiroDatabase : RoomDatabase() {
@@ -24,7 +24,7 @@ abstract class AiroDatabase : RoomDatabase() {
                     context.applicationContext,
                     AiroDatabase::class.java,
                     "airo.db",
-                ).build().also { instance = it }
+                ).fallbackToDestructiveMigration().build().also { instance = it }
             }
     }
 }

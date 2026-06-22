@@ -9,14 +9,27 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val repository: WardrobeRepository) : ViewModel() {
+class HomeViewModel(
+    private val repository: WardrobeRepository,
+    private val userId: String,
+) : ViewModel() {
 
-    val spaces: StateFlow<List<SpaceEntity>> = repository.observeSpaces()
+    val spaces: StateFlow<List<SpaceEntity>> = repository.observeSpaces(userId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun addSpace(name: String) {
         val trimmed = name.trim()
         if (trimmed.isEmpty()) return
-        viewModelScope.launch { repository.addSpace(trimmed) }
+        viewModelScope.launch { repository.addSpace(trimmed, userId) }
+    }
+
+    fun renameSpace(spaceId: String, newName: String) {
+        val trimmed = newName.trim()
+        if (trimmed.isEmpty()) return
+        viewModelScope.launch { repository.renameSpace(spaceId, trimmed) }
+    }
+
+    fun deleteSpace(spaceId: String) {
+        viewModelScope.launch { repository.deleteSpace(spaceId) }
     }
 }

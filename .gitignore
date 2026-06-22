@@ -1,6 +1,7 @@
 *.iml
 .gradle/
 local.properties
+keystore.properties
 .idea/
 .DS_Store
 build/
@@ -9,3 +10,6 @@ captures/
 .cxx/
 *.apk
 *.aab
+*.jks
+*.keystore
+google-services.json

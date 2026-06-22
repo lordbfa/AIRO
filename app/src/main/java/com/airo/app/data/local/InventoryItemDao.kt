@@ -12,4 +12,7 @@ interface InventoryItemDao {
 
     @Insert
     suspend fun insertAll(items: List<InventoryItemEntity>)
+
+    @Query("DELETE FROM inventory_items WHERE spaceId = :spaceId")
+    suspend fun deleteForSpace(spaceId: String)
 }

@@ -15,15 +15,29 @@ class WardrobeRepository(
     private val itemDao: InventoryItemDao,
     private val visionClient: AnthropicVisionClient,
 ) {
-    fun observeSpaces(): Flow<List<SpaceEntity>> = spaceDao.observeAll()
+    fun observeSpaces(userId: String): Flow<List<SpaceEntity>> = spaceDao.observeAllForUser(userId)
 
     fun observeItemsForSpace(spaceId: String): Flow<List<InventoryItemEntity>> =
         itemDao.observeForSpace(spaceId)
 
-    suspend fun addSpace(name: String): SpaceEntity {
-        val space = SpaceEntity(id = UUID.randomUUID().toString(), name = name, createdAt = System.currentTimeMillis())
+    suspend fun addSpace(name: String, userId: String): SpaceEntity {
+        val space = SpaceEntity(
+            id = UUID.randomUUID().toString(),
+            userId = userId,
+            name = name,
+            createdAt = System.currentTimeMillis(),
+        )
         spaceDao.insert(space)
         return space
+    }
+
+    suspend fun renameSpace(spaceId: String, newName: String) {
+        spaceDao.rename(spaceId, newName)
+    }
+
+    suspend fun deleteSpace(spaceId: String) {
+        itemDao.deleteForSpace(spaceId)
+        spaceDao.delete(spaceId)
     }
 
     suspend fun analyzeScene(imageBase64: String, spaceName: String): List<DetectedObject> {
