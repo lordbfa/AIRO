@@ -41,7 +41,7 @@ fun CameraPreview(
 
     LaunchedEffect(Unit) {
         val cameraProvider = context.getCameraProvider()
-        val preview = Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider }
+        val preview = Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
         cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
     }
