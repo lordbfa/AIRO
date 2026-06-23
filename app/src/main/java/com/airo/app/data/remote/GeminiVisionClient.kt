@@ -1,6 +1,6 @@
 package com.airo.app.data.remote
 
-import com.airo.app.data.remote.dto.AnthropicResponse
+import com.airo.app.data.remote.dto.GeminiResponse
 import com.airo.app.data.remote.dto.PlacementSuggestionDto
 import com.airo.app.data.remote.dto.SceneAnalysisDto
 import kotlinx.coroutines.Dispatchers
@@ -17,8 +17,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-/** Thin client around the Anthropic Messages API for scene understanding and placement reasoning. */
-class AnthropicVisionClient(private val apiKey: String, private val model: String = DEFAULT_MODEL) {
+/** Thin client around Google's Gemini generateContent API for scene understanding and placement reasoning. */
+class GeminiVisionClient(private val apiKey: String, private val model: String = DEFAULT_MODEL) {
 
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -51,27 +51,28 @@ class AnthropicVisionClient(private val apiKey: String, private val model: Strin
             """.trimIndent()
 
             val requestBody = buildJsonObject {
-                put("model", model)
-                put("max_tokens", 2048)
-                put("system", systemPrompt)
-                put("messages", buildJsonArray {
+                put("systemInstruction", buildJsonObject {
+                    put("parts", buildJsonArray { add(buildJsonObject { put("text", systemPrompt) }) })
+                })
+                put("contents", buildJsonArray {
                     add(buildJsonObject {
                         put("role", "user")
-                        put("content", buildJsonArray {
+                        put("parts", buildJsonArray {
                             add(buildJsonObject {
-                                put("type", "image")
-                                put("source", buildJsonObject {
-                                    put("type", "base64")
-                                    put("media_type", "image/jpeg")
+                                put("inline_data", buildJsonObject {
+                                    put("mime_type", "image/jpeg")
                                     put("data", imageBase64)
                                 })
                             })
                             add(buildJsonObject {
-                                put("type", "text")
                                 put("text", "Scan this room and list everything you see.")
                             })
                         })
                     })
+                })
+                put("generationConfig", buildJsonObject {
+                    put("responseMimeType", "application/json")
+                    put("maxOutputTokens", 2048)
                 })
             }
 
@@ -96,14 +97,20 @@ class AnthropicVisionClient(private val apiKey: String, private val model: Strin
         """.trimIndent()
 
         val requestBody = buildJsonObject {
-            put("model", model)
-            put("max_tokens", 512)
-            put("system", systemPrompt)
-            put("messages", buildJsonArray {
+            put("systemInstruction", buildJsonObject {
+                put("parts", buildJsonArray { add(buildJsonObject { put("text", systemPrompt) }) })
+            })
+            put("contents", buildJsonArray {
                 add(buildJsonObject {
                     put("role", "user")
-                    put("content", "Where should this go?")
+                    put("parts", buildJsonArray {
+                        add(buildJsonObject { put("text", "Where should this go?") })
+                    })
                 })
+            })
+            put("generationConfig", buildJsonObject {
+                put("responseMimeType", "application/json")
+                put("maxOutputTokens", 512)
             })
         }
 
@@ -113,9 +120,8 @@ class AnthropicVisionClient(private val apiKey: String, private val model: Strin
 
     private fun execute(jsonBody: String): String {
         val request = Request.Builder()
-            .url(API_URL)
-            .header("x-api-key", apiKey)
-            .header("anthropic-version", ANTHROPIC_VERSION)
+            .url("$API_URL/$model:generateContent")
+            .header("x-goog-api-key", apiKey)
             .header("content-type", "application/json")
             .post(jsonBody.toRequestBody("application/json".toMediaType()))
             .build()
@@ -123,14 +129,15 @@ class AnthropicVisionClient(private val apiKey: String, private val model: Strin
         httpClient.newCall(request).execute().use { response ->
             val bodyString = response.body?.string().orEmpty()
             if (!response.isSuccessful) {
-                throw IOException("Anthropic API error ${response.code}: $bodyString")
+                throw IOException("Gemini API error ${response.code}: $bodyString")
             }
-            val parsed = json.decodeFromString<AnthropicResponse>(bodyString)
+            val parsed = json.decodeFromString<GeminiResponse>(bodyString)
             if (parsed.error != null) {
-                throw IOException("Anthropic API error: ${parsed.error.message}")
+                throw IOException("Gemini API error: ${parsed.error.message}")
             }
-            return parsed.content.firstOrNull { it.type == "text" }?.text
-                ?: throw IOException("Anthropic API returned no text content")
+            return parsed.candidates.firstOrNull()
+                ?.content?.parts?.firstOrNull { it.text != null }?.text
+                ?: throw IOException("Gemini API returned no text content")
         }
     }
 
@@ -138,8 +145,9 @@ class AnthropicVisionClient(private val apiKey: String, private val model: Strin
         text.trim().removePrefix("```json").removePrefix("```").removeSuffix("```").trim()
 
     companion object {
-        private const val API_URL = "https://api.anthropic.com/v1/messages"
-        private const val ANTHROPIC_VERSION = "2023-06-01"
-        const val DEFAULT_MODEL = "claude-sonnet-4-6"
+        private const val API_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+        // Check https://aistudio.google.com for the current recommended free-tier flash model
+        // if this one is ever retired.
+        const val DEFAULT_MODEL = "gemini-2.0-flash"
     }
 }

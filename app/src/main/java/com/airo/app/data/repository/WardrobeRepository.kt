@@ -4,7 +4,7 @@ import com.airo.app.data.local.InventoryItemDao
 import com.airo.app.data.local.InventoryItemEntity
 import com.airo.app.data.local.SpaceDao
 import com.airo.app.data.local.SpaceEntity
-import com.airo.app.data.remote.AnthropicVisionClient
+import com.airo.app.data.remote.GeminiVisionClient
 import com.airo.app.domain.model.DetectedObject
 import com.airo.app.domain.model.ItemCategory
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +13,7 @@ import java.util.UUID
 class WardrobeRepository(
     private val spaceDao: SpaceDao,
     private val itemDao: InventoryItemDao,
-    private val visionClient: AnthropicVisionClient,
+    private val visionClient: GeminiVisionClient,
 ) {
     fun observeSpaces(userId: String): Flow<List<SpaceEntity>> = spaceDao.observeAllForUser(userId)
 

@@ -5,7 +5,8 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import java.io.ByteArrayOutputStream
 
-// Phone photos can be 10+ MB; Claude's vision input is capped around this resolution anyway.
+// Phone photos can be 10+ MB; Gemini tiles images into ~768px chunks for tokenization, so
+// downscaling first keeps both the upload size and token cost down.
 fun ByteArray.toResizedJpegBase64(maxDimension: Int = 1568, quality: Int = 85): String {
     val original = BitmapFactory.decodeByteArray(this, 0, size)
     val longEdge = maxOf(original.width, original.height)

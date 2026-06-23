@@ -39,10 +39,10 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        val anthropicApiKey = localProperties.getProperty("ANTHROPIC_API_KEY")
-            ?: System.getenv("ANTHROPIC_API_KEY")
+        val geminiApiKey = localProperties.getProperty("GEMINI_API_KEY")
+            ?: System.getenv("GEMINI_API_KEY")
             ?: ""
-        buildConfigField("String", "ANTHROPIC_API_KEY", "\"$anthropicApiKey\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
 
         val webClientId = localProperties.getProperty("GOOGLE_WEB_CLIENT_ID")
             ?: System.getenv("GOOGLE_WEB_CLIENT_ID")

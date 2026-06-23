@@ -13,9 +13,9 @@ either Google Sign-In or an email address and password. We (via Firebase) store 
 email address, display name, and profile photo URL if provided. Passwords are never
 seen or stored by us directly — they're handled entirely by Firebase Authentication.
 
-**Room photos.** When you scan a room, the photo is sent to Anthropic's Claude API
+**Room photos.** When you scan a room, the photo is sent to Google's Gemini API
 for object detection and is not stored by us beyond the request needed to analyze it.
-See Anthropic's own privacy policy for how they handle API inputs.
+See Google's own privacy policy for how they handle API inputs.
 
 **Rooms and inventory items.** Names of spaces ("Bedroom", "Hallway Closet") and the
 items you scan and save (names, categories, suggested storage locations) are stored
@@ -26,13 +26,13 @@ is **not synced to any server** and is **deleted if you uninstall the app**.
 
 - No advertising or ad tracking.
 - No sale or sharing of personal data with third parties beyond the processors
-  named above (Firebase for authentication, Anthropic for photo analysis).
+  named above (Firebase for authentication, Google Gemini for photo analysis).
 - No analytics SDKs.
 
 ## Permissions
 
 - **Camera**: required to scan rooms. Photos are only used for the scan you take.
-- **Internet**: required to reach Firebase (sign-in) and Anthropic (object detection).
+- **Internet**: required to reach Firebase (sign-in) and Google Gemini (object detection).
 
 ## Data deletion
 

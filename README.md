@@ -13,7 +13,7 @@ each account has its own rooms.
 2. Create a **space** (e.g. "Bedroom", "Hallway Closet"). Rename or delete spaces any
    time from the home screen's overflow menu.
 3. Tap **Scan room** and take a photo.
-4. The photo is sent to Claude's vision API, which returns every object it sees,
+4. The photo is sent to Google's Gemini API, which returns every object it sees,
    flags waste, and either gives a direct storage suggestion or asks a short
    clarifying question with a few quick-pick options.
 5. Answer any clarifications — each answer triggers a follow-up call that returns a
@@ -28,7 +28,7 @@ app/src/main/java/com/airo/app/
   ui/            Compose screens (auth, profile, home, space detail, scan/review) + theme
   data/auth/     Firebase Authentication wrapper (email/password + Google)
   data/local/    Room database (spaces, saved inventory items), scoped per signed-in user
-  data/remote/   Anthropic Messages API client (vision + placement reasoning)
+  data/remote/   Google Gemini API client (vision + placement reasoning)
   data/repository/  Combines network + persistence
   domain/model/  DetectedObject, ItemCategory
   di/            Minimal hand-rolled DI container (no Hilt, app is small)
@@ -37,7 +37,7 @@ app/src/main/java/com/airo/app/
 ## Setup
 
 1. Copy `local.properties.example` to `local.properties` and fill in:
-   - `ANTHROPIC_API_KEY` (get one at https://console.anthropic.com)
+   - `GEMINI_API_KEY` (get a free one at https://aistudio.google.com/app/apikey)
    - `GOOGLE_WEB_CLIENT_ID` (from Firebase — see `FIREBASE_SETUP.md`)
 2. Follow `FIREBASE_SETUP.md` to create a Firebase project, enable Email/Password and
    Google sign-in, and drop `google-services.json` into `app/`. The app won't compile

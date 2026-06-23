@@ -1,5 +1,6 @@
 # Copy this file to local.properties (already gitignored) and fill in your keys.
-ANTHROPIC_API_KEY=sk-ant-...
+# Get a free Gemini API key at https://aistudio.google.com/app/apikey
+GEMINI_API_KEY=AI...
 
 # OAuth 2.0 Web client ID from the Firebase console (Authentication > Sign-in method > Google),
 # used by Credential Manager's GetGoogleIdOption to request a Google ID token. See FIREBASE_SETUP.md.
